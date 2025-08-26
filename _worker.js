@@ -1,4 +1,4 @@
-// Cloudflare Worker for D1 Database API
+﻿// Cloudflare Worker for D1 Database API
 export default {
   async fetch(request, env) {
     const corsHeaders = {

@@ -1,5 +1,6 @@
 name = "todo-schedules"
 compatibility_date = "2024-01-01"
+main = "_worker.js"
 
 # D1 資料庫配置
 [[d1_databases]]
@@ -7,9 +8,7 @@ binding = "DB"
 database_name = "todo-schedules"
 database_id = "6598209a-a0c6-4daf-b59b-a1f185c2778b"
 
-# Pages 配置
-[pages]
-directory = "."
+# 移除 Pages 設定，改用 Worker 入口檔 _worker.js
 
 # 環境變數（如果需要）
 [vars]
