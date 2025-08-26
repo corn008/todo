@@ -1,0 +1,1784 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>留守、後管行程管制系統</title>
+    <style>
+        body {
+            font-family: 'Microsoft JhengHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 4px;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 8px;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 8px;
+            font-size: 18px;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            font-weight: 700;
+        }
+
+        .form-section {
+            background: linear-gradient(145deg, #f8f9fa, #e9ecef);
+            padding: 6px;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            border: 1px solid rgba(0,0,0,0.05);
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .form-row {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            margin-bottom: 6px;
+        }
+
+        .form-row label {
+            font-weight: bold;
+            color: #2c3e50;
+            font-size: 14px;
+            text-shadow: 0 1px 1px rgba(0,0,0,0.05);
+        }
+
+        .form-row input,
+        .form-row select {
+            padding: 10px;
+            border: 2px solid #e1e8ed;
+            border-radius: 8px;
+            font-size: 16px;
+            width: 100%;
+            box-sizing: border-box;
+            min-height: 44px;
+            background: rgba(255, 255, 255, 0.9);
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .form-row input:focus,
+        .form-row select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            background: white;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 1px 0;
+            width: 100%;
+            min-height: 44px;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            font-weight: 600;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .btn:hover {
+            background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:active {
+            background: linear-gradient(135deg, #4f62c6 0%, #5f3780 100%);
+            transform: translateY(0);
+            box-shadow: 0 2px 10px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-small {
+            font-size: 14px;
+            padding: 6px 10px;
+            min-height: 36px;
+            width: auto;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.25);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+        }
+
+        .btn-danger:hover {
+            background: linear-gradient(135deg, #ff5252 0%, #e53935 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+        }
+
+        .schedule-display {
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            border-radius: 12px;
+            padding: 8px;
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.9), rgba(248, 249, 250, 0.9));
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+
+        .date-header {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 12px;
+            color: #2c3e50;
+            text-align: center;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .department {
+            margin-bottom: 15px;
+        }
+
+        .department-name {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 8px;
+            font-size: 16px;
+            text-shadow: 0 1px 1px rgba(0,0,0,0.05);
+        }
+
+        .staff-list {
+            margin-left: 12px;
+        }
+
+                 .staff-item {
+             margin-bottom: 6px;
+             padding: 12px;
+             background: linear-gradient(145deg, #ffffff, #f8f9fa);
+             border-radius: 8px;
+             font-size: 15px;
+             border: 1px solid rgba(102, 126, 234, 0.1);
+             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+             transition: all 0.3s ease;
+             display: flex;
+             align-items: center;
+             justify-content: space-between;
+         }
+
+         .staff-item:hover {
+             transform: translateY(-1px);
+             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+         }
+
+         .staff-item .staff-info {
+             display: flex;
+             align-items: center;
+             flex: 1;
+         }
+
+         .btn-delete {
+             background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+             color: white;
+             border: none;
+             border-radius: 50%;
+             width: 24px;
+             height: 24px;
+             font-size: 16px;
+             font-weight: bold;
+             cursor: pointer;
+             display: flex;
+             align-items: center;
+             justify-content: center;
+             margin-left: 8px;
+             transition: all 0.3s ease;
+             box-shadow: 0 2px 4px rgba(255, 107, 107, 0.3);
+             -webkit-tap-highlight-color: transparent;
+         }
+
+         .btn-delete:hover {
+             background: linear-gradient(135deg, #ff5252 0%, #e53935 100%);
+             transform: scale(1.1);
+             box-shadow: 0 4px 8px rgba(255, 107, 107, 0.4);
+         }
+
+         .btn-delete:active {
+             transform: scale(0.95);
+         }
+
+        .staff-name {
+            font-weight: bold;
+            margin-right: 8px;
+            color: #2c3e50;
+        }
+
+        .staff-status {
+            color: #667eea;
+            font-weight: 600;
+            text-shadow: 0 1px 1px rgba(0,0,0,0.05);
+        }
+
+        .no-data {
+            text-align: center;
+            color: #999;
+            font-style: italic;
+            padding: 20px;
+            font-size: 16px;
+        }
+
+                 .view-controls {
+             display: flex;
+             flex-direction: column;
+             gap: 6px;
+             align-items: center;
+             margin-bottom: 8px;
+             position: relative;
+             z-index: 10;
+         }
+
+                 .date-picker {
+             display: inline-block;
+             background: linear-gradient(145deg, #ffffff, #f8f9fa);
+             border: 2px solid #e1e8ed;
+             border-radius: 8px;
+             padding: 8px;
+             cursor: pointer;
+             user-select: none;
+             min-width: 100px;
+             text-align: center;
+             position: relative;
+             transition: all 0.3s ease;
+             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+             z-index: 5;
+         }
+
+        .date-picker:hover {
+            border-color: #667eea;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+        }
+
+        .date-picker.selected {
+            border-color: #667eea;
+            background: linear-gradient(145deg, #e3f2fd, #bbdefb);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
+        }
+
+        .date-picker .date-text {
+            font-size: 16px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .date-picker .date-hint {
+            font-size: 13px;
+            color: #666;
+            margin-top: 2px;
+        }
+
+                 .calendar-popup {
+             position: fixed;
+             top: 50%;
+             left: 50%;
+             transform: translate(-50%, -50%);
+             background: rgba(255, 255, 255, 0.95);
+             backdrop-filter: blur(20px);
+             border: 1px solid rgba(255, 255, 255, 0.2);
+             border-radius: 16px;
+             box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+             z-index: 2000;
+             min-width: 300px;
+             padding: 16px;
+             max-width: 95vw;
+             max-height: 85vh;
+             overflow-y: auto;
+         }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .calendar-nav {
+            background: none;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 8px 12px;
+            color: #007bff;
+            border-radius: 3px;
+            min-width: 44px;
+            min-height: 44px;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .calendar-nav:hover {
+            background: #f0f0f0;
+        }
+
+        .calendar-title {
+            font-weight: bold;
+            font-size: 16px;
+            color: #333;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 1px;
+        }
+
+        .calendar-weekday {
+            text-align: center;
+            font-weight: bold;
+            color: #666;
+            padding: 6px 2px;
+            font-size: 14px;
+        }
+
+        .calendar-day {
+            text-align: center;
+            padding: 10px 2px;
+            cursor: pointer;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            -webkit-tap-highlight-color: transparent;
+            margin: 1px;
+        }
+
+        .calendar-day:hover {
+            background: linear-gradient(145deg, #f0f0f0, #e8e8e8);
+            transform: scale(1.05);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .calendar-day.selected {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .calendar-day.range-start {
+            background: linear-gradient(145deg, #e3f2fd, #bbdefb);
+            color: #667eea;
+            border: 2px solid #667eea;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+        }
+
+        .calendar-day.range-end {
+            background: linear-gradient(145deg, #e3f2fd, #bbdefb);
+            color: #667eea;
+            border: 2px solid #667eea;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+        }
+
+        .calendar-day.in-range {
+            background: linear-gradient(145deg, #e3f2fd, #bbdefb);
+            color: #667eea;
+        }
+
+        .calendar-day.multi-selected {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+        }
+
+        .calendar-day.today {
+            background: linear-gradient(145deg, #e3f2fd, #bbdefb);
+            color: #667eea;
+            font-weight: bold;
+            border: 2px solid #667eea;
+        }
+
+        .calendar-day.other-month {
+            color: #ccc;
+        }
+
+        .calendar-day.disabled {
+            color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .calendar-day.disabled:hover {
+            background: none;
+        }
+
+        .selection-section {
+            background: linear-gradient(145deg, #f8f9fa, #e9ecef);
+            padding: 6px;
+            border-radius: 12px;
+            border: 1px solid rgba(102, 126, 234, 0.1);
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .selection-section h3 {
+            margin: 0 0 4px 0;
+            color: #2c3e50;
+            font-size: 14px;
+            font-weight: 600;
+            text-shadow: 0 1px 1px rgba(0,0,0,0.05);
+        }
+
+        .calendar-footer {
+            margin-top: 12px;
+            text-align: center;
+        }
+
+        .calendar-footer .btn {
+            margin: 0 3px;
+            padding: 6px 12px;
+            min-height: 32px;
+        }
+
+        .instructions {
+            margin-top: 4px;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .instructions div {
+            margin-bottom: 2px;
+        }
+
+        .clear-btn {
+            margin-top: 3px;
+        }
+
+        /* 手機觸控優化 */
+        .btn {
+            min-height: 44px;
+        }
+        
+        .form-row input,
+        .form-row select {
+            min-height: 44px;
+        }
+        
+        .calendar-day {
+            min-height: 44px;
+            font-size: 14px;
+        }
+        
+                 /* 防止手機瀏覽器的縮放 */
+         input[type="text"], 
+         input[type="email"], 
+         input[type="password"], 
+         input[type="number"], 
+         input[type="tel"], 
+         input[type="url"], 
+         select, 
+         textarea {
+             font-size: 16px !important;
+         }
+         
+         /* 登入區域樣式 */
+         .login-section {
+             background: linear-gradient(145deg, #f8f9fa, #e9ecef);
+             padding: 16px;
+             border-radius: 12px;
+             margin-bottom: 12px;
+             border: 1px solid rgba(102, 126, 234, 0.1);
+             box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+             text-align: center;
+         }
+         
+         .login-section h3 {
+             margin: 0 0 12px 0;
+             color: #2c3e50;
+             font-size: 16px;
+             font-weight: 600;
+         }
+         
+         .user-info {
+             background: linear-gradient(135deg, #28a745, #20c997);
+             color: white;
+             padding: 8px 12px;
+             border-radius: 8px;
+             margin-bottom: 8px;
+             font-size: 14px;
+             font-weight: 600;
+             display: flex;
+             justify-content: space-between;
+             align-items: center;
+         }
+    </style>
+</head>
+<body>
+        <div class="container">
+                  <h1>留守、後管行程管制系統</h1>
+                  
+                  <!-- 使用者登入區域 -->
+                  <div id="loginSection" class="login-section">
+                      <h3>請選擇您的暱稱</h3>
+                      <div style="display: flex; gap: 8px; align-items: center;">
+                          <select id="userNickname" style="flex: 1; min-width: 0;">
+                              <option value="">請選擇暱稱</option>
+                              <optgroup label="後管科">
+                                  <option value="何珮騏">何珮騏</option>
+                                  <option value="吳孟臻">吳孟臻</option>
+                                  <option value="徐一平">徐一平</option>
+                                  <option value="邱千宜">邱千宜</option>
+                                  <option value="丘琼綾">丘琼綾</option>
+                                  <option value="滕愛文">滕愛文</option>
+                              </optgroup>
+                              <optgroup label="留守科">
+                                  <option value="賈鈺民">賈鈺民</option>
+                                  <option value="何美貞">何美貞</option>
+                              </optgroup>
+                          </select>
+                          <button class="btn" onclick="login()" style="width: auto; min-width: 80px;">登入</button>
+                      </div>
+                      <div style="font-size: 12px; color: #666; margin-top: 4px;">
+                          💡 暱稱用於識別行程的新增者
+                      </div>
+                  </div>
+                  
+                  <!-- 主要功能區域 -->
+                  <div id="mainSection" style="display: none;">
+                      
+                      <!-- 使用者資訊顯示 -->
+                      <div id="userInfo" class="user-info" style="display: none;">
+                          <span>👤 當前使用者：<span id="currentUser"></span></span>
+                          <button class="btn btn-small" onclick="logout()" style="background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3); font-size: 12px; padding: 4px 8px; min-height: 28px;">登出</button>
+                      </div>
+        
+        <div class="form-section">
+                         <div class="form-row">
+                 <label>日期選擇：</label>
+                 <div class="selection-section">
+                     <h3>點擊下方日曆選擇日期</h3>
+                     <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 8px;">
+                         <div class="date-picker" id="mainDatePicker" onclick="toggleCalendar('main')" style="flex: 1;">
+                             <div class="date-text" id="mainDateText">點擊開啟日曆選擇</div>
+                             <div class="date-hint">支援多選日期</div>
+                         </div>
+                         <button class="btn btn-small" onclick="clearSelectedDates()" style="background: #6c757d; font-size: 14px; padding: 6px 8px; min-height: 36px; width: auto;">
+                             清空選擇
+                         </button>
+                     </div>
+                     <div class="instructions">
+                         <div>• 點擊日期選取/取消選取</div>
+                         <div>• 拖拽選擇日期範圍</div>
+                     </div>
+                 </div>
+             </div>
+            
+            <div class="form-row">
+                <label>選擇人員：</label>
+                <select id="staffSelect">
+                    <option value="">請選擇人員</option>
+                    <optgroup label="後管科">
+                        <option value="後管科,何珮騏">何珮騏</option>
+                        <option value="後管科,吳孟臻">吳孟臻</option>
+                        <option value="後管科,徐一平">徐一平</option>
+                        <option value="後管科,邱千宜">邱千宜</option>
+                        <option value="後管科,丘琼綾">丘琼綾</option>
+                        <option value="後管科,滕愛文">滕愛文</option>
+                    </optgroup>
+                    <optgroup label="留守科">
+                        <option value="留守科,賈鈺民">賈鈺民</option>
+                        <option value="留守科,何美貞">何美貞</option>
+                    </optgroup>
+                </select>
+            </div>
+            
+                         <div class="form-row">
+                 <label>行程狀態：</label>
+                 <div style="display: flex; gap: 8px; align-items: center;">
+                                           <select id="statusSelect" style="flex: 1; min-width: 0;">
+                          <option value="">請選擇狀態</option>
+                          <option value="上班">上班</option>
+                          <option value="休假">休假</option>
+                          <option value="上午休假">上午休假</option>
+                          <option value="下午休假">下午休假</option>
+                          <option value="差勤">差勤</option>
+                          <option value="服務台">服務台</option>
+                          <option value="custom">自行輸入...</option>
+                      </select>
+                                           <input type="text" id="statusInput" placeholder="自行輸入狀態" style="flex: 1; min-width: 0; display: none;">
+                      <button type="button" id="backToSelectBtn" onclick="backToStatusSelect()" style="display: none; background: #6c757d; color: white; border: none; border-radius: 4px; padding: 6px 8px; font-size: 12px; cursor: pointer; margin-left: 4px;">回到選單</button>
+                     <button class="btn" onclick="addSchedule()" style="width: auto; min-width: 80px;">新增</button>
+                     <button class="btn btn-danger" onclick="clearAll()" style="width: auto; min-width: 60px;">清除</button>
+                 </div>
+             </div>
+        </div>
+
+                                                                       <div class="schedule-display">
+               <div class="view-controls">
+                   <label>檢視日期：</label>
+                   <div style="display: flex; gap: 8px; align-items: center; position: relative;">
+                       <div class="date-picker" id="viewDatePicker" onclick="toggleCalendar('view')" style="flex: 1; position: relative; z-index: 5;">
+                           <div class="date-text" id="viewDateText">選擇檢視日期</div>
+                           <div class="date-hint">點擊選擇</div>
+                       </div>
+                       <button class="btn btn-small" onclick="copyScheduleText()" style="background: #17a2b8; font-size: 10px; padding: 6px 8px; min-height: 36px; width: auto; position: relative; z-index: 1;">
+                           複製
+                       </button>
+                   </div>
+               </div>
+              
+                                                                                                                                               <!-- Google Sheets 同步提示 -->
+                   <div id="githubSyncStatus" style="margin-top: 8px; padding: 8px; border-radius: 8px;">
+                       <div style="font-size: 12px; text-align: center;">
+                           <span id="syncStatusText">☁️ D1 資料庫已啟用 - 所有裝置資料即時同步</span>
+                       </div>
+                   </div>
+             <div id="scheduleOutput">
+                 <div class="no-data">請選擇日期檢視行程</div>
+             </div>
+         </div>
+
+                 <!-- 日曆彈出視窗 -->
+         <div id="calendarPopup" class="calendar-popup" style="display: none;" onclick="event.stopPropagation();">
+             <div class="calendar-header">
+                 <button class="calendar-nav" onclick="previousMonth()">‹</button>
+                 <div class="calendar-title" id="calendarTitle"></div>
+                 <button class="calendar-nav" onclick="nextMonth()">›</button>
+             </div>
+             <div class="calendar-grid" id="calendarGrid"></div>
+             <div class="calendar-footer">
+                 <button class="btn btn-small" onclick="selectToday()">今天</button>
+                 <button class="btn btn-small" onclick="closeCalendar()">關閉</button>
+             </div>
+         </div>
+    </div>
+
+    <script>
+                 // 初始化
+         let schedules = {};
+         let currentCalendarType = null; // 'main', 'view'
+         let currentCalendarDate = new Date();
+         let selectedDates = []; // 存儲選中的日期
+         let isDragging = false;
+         let dragStartDate = null;
+         let dragEndDate = null;
+         let touchStartTime = 0;
+         let currentUser = ''; // 當前使用者暱稱
+         
+                           // 系統配置
+        const SYSTEM_NAME = '留守、後管行程管制系統';
+        
+        // D1 資料庫 API 端點
+        const API_BASE_URL = window.location.origin;
+        const SCHEDULES_API = `${API_BASE_URL}/api/schedules`;
+        const USERS_API = `${API_BASE_URL}/api/users`;
+        const DEPARTMENTS_API = `${API_BASE_URL}/api/departments`;
+          
+          // 檢查是否已登入
+          checkLoginStatus();
+          
+          // 檢查自動同步狀態並更新顯示
+          updateAutoSyncStatus();
+          
+          // 從 D1 資料庫載入資料
+          loadSchedulesFromDB();
+          
+          // 調試：檢查載入的資料
+          console.log('載入的行程資料:', schedules);
+        
+        // 設定今天日期為預設值
+        setDateDisplay('viewDateText', getTodayDate());
+        
+        function getTodayDate() {
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = String(today.getMonth() + 1).padStart(2, '0');
+            const day = String(today.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        function getWeekday(dateStr) {
+            const weekdays = ['日', '一', '二', '三', '四', '五', '六'];
+            const date = new Date(dateStr);
+            return weekdays[date.getDay()];
+        }
+
+        function formatDate(dateStr) {
+            const date = new Date(dateStr);
+            const month = date.getMonth() + 1;
+            const day = date.getDate();
+            const weekday = getWeekday(dateStr);
+            return `${month}/${day}（${weekday}）`;
+        }
+
+        function setDateDisplay(elementId, dateStr) {
+            const element = document.getElementById(elementId);
+            if (dateStr) {
+                const date = new Date(dateStr);
+                const month = date.getMonth() + 1;
+                const day = date.getDate();
+                const weekday = getWeekday(dateStr);
+                element.textContent = `${month}/${day}（${weekday}）`;
+                element.parentElement.classList.add('selected');
+            } else {
+                let defaultText = '選擇日期';
+                if (elementId.includes('view')) defaultText = '選擇檢視日期';
+                else if (elementId.includes('main')) defaultText = '點擊開啟日曆選擇';
+                element.textContent = defaultText;
+                element.parentElement.classList.remove('selected');
+            }
+        }
+
+        function updateMainDateDisplay() {
+            const element = document.getElementById('mainDateText');
+            if (selectedDates.length === 0) {
+                element.textContent = '點擊開啟日曆選擇';
+                element.parentElement.classList.remove('selected');
+            } else if (selectedDates.length === 1) {
+                const date = new Date(selectedDates[0]);
+                const month = date.getMonth() + 1;
+                const day = date.getDate();
+                const weekday = getWeekday(selectedDates[0]);
+                element.textContent = `${month}/${day}（${weekday}）`;
+                element.parentElement.classList.add('selected');
+            } else {
+                element.textContent = `已選擇 ${selectedDates.length} 個日期`;
+                element.parentElement.classList.add('selected');
+            }
+        }
+
+        function getSelectedDateValue(type) {
+            if (type === 'view') {
+                const elementId = type + 'DateText';
+                const element = document.getElementById(elementId);
+                const text = element.textContent;
+                if (text.includes('選擇')) return '';
+                
+                // 從顯示文字中提取日期
+                const match = text.match(/(\d+)\/(\d+)/);
+                if (match) {
+                    const month = parseInt(match[1]);
+                    const day = parseInt(match[2]);
+                    
+                    // 智能判斷年份：如果月份是12月且當前是1月，則使用去年
+                    // 如果月份是1月且當前是12月，則使用明年
+                    let year = new Date().getFullYear();
+                    const currentMonth = new Date().getMonth() + 1;
+                    
+                    if (month === 12 && currentMonth === 1) {
+                        year = year - 1; // 去年12月
+                    } else if (month === 1 && currentMonth === 12) {
+                        year = year + 1; // 明年1月
+                    }
+                    
+                    return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                }
+                return '';
+            }
+            return '';
+        }
+
+                 function toggleCalendar(type) {
+             currentCalendarType = type;
+             const popup = document.getElementById('calendarPopup');
+             
+             if (popup.style.display === 'none') {
+                 // 顯示日曆
+                 currentCalendarDate = new Date();
+                 renderCalendar();
+                 popup.style.display = 'block';
+                 
+                 // 防止事件冒泡
+                 event.stopPropagation();
+             } else {
+                 popup.style.display = 'none';
+             }
+         }
+
+        function renderCalendar() {
+            const title = document.getElementById('calendarTitle');
+            const grid = document.getElementById('calendarGrid');
+            
+            const year = currentCalendarDate.getFullYear();
+            const month = currentCalendarDate.getMonth();
+            
+            title.textContent = `${year}年${month + 1}月`;
+            
+            // 清空網格
+            grid.innerHTML = '';
+            
+            // 添加星期標題
+            const weekdays = ['日', '一', '二', '三', '四', '五', '六'];
+            weekdays.forEach(day => {
+                const dayElement = document.createElement('div');
+                dayElement.className = 'calendar-weekday';
+                dayElement.textContent = day;
+                grid.appendChild(dayElement);
+            });
+            
+            // 獲取月份第一天和最後一天
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            const startDate = new Date(firstDay);
+            startDate.setDate(startDate.getDate() - firstDay.getDay());
+            
+            // 生成日期網格
+            for (let i = 0; i < 42; i++) {
+                const date = new Date(startDate);
+                date.setDate(startDate.getDate() + i);
+                
+                const dayElement = document.createElement('div');
+                dayElement.className = 'calendar-day';
+                
+                if (date.getMonth() !== month) {
+                    dayElement.classList.add('other-month');
+                }
+                
+                if (date.toDateString() === new Date().toDateString()) {
+                    dayElement.classList.add('today');
+                }
+                
+                // 檢查是否為選中的日期
+                const dateStr = date.getFullYear() + '-' + 
+                    String(date.getMonth() + 1).padStart(2, '0') + '-' + 
+                    String(date.getDate()).padStart(2, '0');
+                
+                if (selectedDates.includes(dateStr)) {
+                    dayElement.classList.add('multi-selected');
+                }
+                
+                dayElement.textContent = date.getDate();
+                
+                // 添加事件監聽器
+                dayElement.addEventListener('click', (e) => handleDateClick(date, e));
+                dayElement.addEventListener('mousedown', (e) => handleDateMouseDown(date, e));
+                dayElement.addEventListener('mouseover', (e) => handleDateMouseOver(date, e));
+                dayElement.addEventListener('touchstart', (e) => handleDateTouchStart(date, e), { passive: false });
+                dayElement.addEventListener('touchmove', (e) => handleDateTouchMove(date, e), { passive: false });
+                dayElement.addEventListener('touchend', (e) => handleDateTouchEnd(date, e));
+                
+                grid.appendChild(dayElement);
+            }
+        }
+
+        function handleDateClick(date, event) {
+            // 防止觸控事件干擾
+            if (event.type === 'touchstart' || event.type === 'touchmove' || event.type === 'touchend') {
+                return;
+            }
+            
+            if (currentCalendarType === 'view') {
+                const dateStr = date.getFullYear() + '-' + 
+                    String(date.getMonth() + 1).padStart(2, '0') + '-' + 
+                    String(date.getDate()).padStart(2, '0');
+                setDateDisplay('viewDateText', dateStr);
+                closeCalendar();
+                displaySchedule(dateStr);
+                return;
+            }
+            
+            if (currentCalendarType === 'main') {
+                // 如果是拖拽操作，不處理點擊
+                if (isDragging) {
+                    return;
+                }
+                
+                const dateStr = date.getFullYear() + '-' + 
+                    String(date.getMonth() + 1).padStart(2, '0') + '-' + 
+                    String(date.getDate()).padStart(2, '0');
+                
+                // 檢查是否已經選中這個日期
+                if (selectedDates.includes(dateStr)) {
+                    // 如果已經選中，則取消選取
+                    selectedDates = selectedDates.filter(d => d !== dateStr);
+                } else {
+                    // 檢查是否超過最大選擇數量
+                    if (selectedDates.length >= 31) {
+                        alert('最多只能選擇31個日期');
+                        return;
+                    }
+                    // 如果沒有選中，則添加到選中列表
+                    selectedDates.push(dateStr);
+                }
+                
+                updateMainDateDisplay();
+                renderCalendar();
+            }
+        }
+
+        function handleDateMouseDown(date, event) {
+            isDragging = false;
+            const dateStr = date.getFullYear() + '-' + 
+                String(date.getMonth() + 1).padStart(2, '0') + '-' + 
+                String(date.getDate()).padStart(2, '0');
+            dragStartDate = dateStr;
+            dragEndDate = dateStr;
+        }
+
+        function handleDateMouseOver(date, event) {
+            if (dragStartDate) {
+                if (!isDragging) {
+                    isDragging = true;
+                }
+                const dateStr = date.getFullYear() + '-' + 
+                    String(date.getMonth() + 1).padStart(2, '0') + '-' + 
+                    String(date.getDate()).padStart(2, '0');
+                dragEndDate = dateStr;
+                renderCalendar();
+            }
+        }
+
+        function handleDateTouchStart(date, event) {
+            // 只在必要時阻止預設行為
+            touchStartTime = Date.now();
+            isDragging = false;
+            const dateStr = date.getFullYear() + '-' + 
+                String(date.getMonth() + 1).padStart(2, '0') + '-' + 
+                String(date.getDate()).padStart(2, '0');
+            dragStartDate = dateStr;
+            dragEndDate = dateStr;
+        }
+
+        function handleDateTouchMove(date, event) {
+            if (dragStartDate) {
+                // 只在拖拽時阻止預設行為
+                if (!isDragging) {
+                    isDragging = true;
+                }
+                const dateStr = date.getFullYear() + '-' + 
+                    String(date.getMonth() + 1).padStart(2, '0') + '-' + 
+                    String(date.getDate()).padStart(2, '0');
+                dragEndDate = dateStr;
+                renderCalendar();
+            }
+        }
+
+        function handleDateTouchEnd(date, event) {
+            const touchEndTime = Date.now();
+            const touchDuration = touchEndTime - touchStartTime;
+            
+            if (currentCalendarType === 'view') {
+                // 檢視日曆的觸控處理
+                if (touchDuration < 400 && !isDragging) {
+                    const dateStr = date.getFullYear() + '-' + 
+                        String(date.getMonth() + 1).padStart(2, '0') + '-' + 
+                        String(date.getDate()).padStart(2, '0');
+                    setDateDisplay('viewDateText', dateStr);
+                    closeCalendar();
+                    displaySchedule(dateStr);
+                    return;
+                }
+            }
+            
+            if (currentCalendarType === 'main') {
+                // 如果觸控時間很短且沒有拖拽，則視為點擊
+                if (touchDuration < 400 && !isDragging) {
+                    const dateStr = date.getFullYear() + '-' + 
+                        String(date.getMonth() + 1).padStart(2, '0') + '-' + 
+                        String(date.getDate()).padStart(2, '0');
+                    
+                    // 檢查是否已經選中這個日期
+                    if (selectedDates.includes(dateStr)) {
+                        // 如果已經選中，則取消選取
+                        selectedDates = selectedDates.filter(d => d !== dateStr);
+                    } else {
+                        // 檢查是否超過最大選擇數量
+                        if (selectedDates.length >= 31) {
+                            alert('最多只能選擇31個日期');
+                            return;
+                        }
+                        // 如果沒有選中，則添加到選中列表
+                        selectedDates.push(dateStr);
+                    }
+                    
+                    updateMainDateDisplay();
+                    renderCalendar();
+                }
+                
+                // 拖拽結束處理由 handleDragEnd 統一處理
+            }
+        }
+
+        function selectDate(date) {
+            const dateStr = date.getFullYear() + '-' + 
+                String(date.getMonth() + 1).padStart(2, '0') + '-' + 
+                String(date.getDate()).padStart(2, '0');
+            
+            if (currentCalendarType === 'view') {
+                setDateDisplay('viewDateText', dateStr);
+            }
+            
+            closeCalendar();
+        }
+
+        function previousMonth() {
+            currentCalendarDate.setMonth(currentCalendarDate.getMonth() - 1);
+            renderCalendar();
+        }
+
+        function nextMonth() {
+            currentCalendarDate.setMonth(currentCalendarDate.getMonth() + 1);
+            renderCalendar();
+        }
+
+        function selectToday() {
+            const today = new Date();
+            selectDate(today);
+        }
+
+        function closeCalendar() {
+            document.getElementById('calendarPopup').style.display = 'none';
+        }
+
+        function addSchedule() {
+            const staffValue = document.getElementById('staffSelect').value;
+            const statusSelect = document.getElementById('statusSelect');
+            const statusInput = document.getElementById('statusInput');
+            
+            // 獲取狀態值
+            let status = '';
+            let isCustomInput = false;
+            
+            // 檢查是否為自行輸入模式
+            if (statusSelect.style.display === 'none' || statusInput.style.display === 'block') {
+                isCustomInput = true;
+                status = statusInput.value.trim();
+            } else {
+                status = statusSelect.value;
+            }
+
+                         if (selectedDates.length === 0) {
+                 alert('請先選擇要新增行程的日期');
+                 return;
+             }
+ 
+             if (!staffValue) {
+                 alert('請選擇要新增行程的人員');
+                 return;
+             }
+            
+            if (!status) {
+                if (isCustomInput) {
+                    alert('請輸入行程狀態');
+                } else {
+                    alert('請選擇行程狀態');
+                }
+                return;
+            }
+            
+            // 驗證日期格式
+            const invalidDates = selectedDates.filter(date => {
+                const dateObj = new Date(date);
+                return isNaN(dateObj.getTime());
+            });
+            
+            if (invalidDates.length > 0) {
+                alert('發現無效的日期格式，請重新選擇');
+                selectedDates.length = 0;
+                updateMainDateDisplay();
+                renderCalendar();
+                return;
+            }
+
+            const [department, staffName] = staffValue.split(',');
+
+            // 為每個選中的日期添加行程
+            selectedDates.forEach(date => {
+                if (!schedules[date]) {
+                    schedules[date] = {};
+                }
+
+                if (!schedules[date][department]) {
+                    schedules[date][department] = {};
+                }
+
+                                 schedules[date][department][staffName] = {
+                     status: status,
+                     addedBy: currentUser,
+                     addedAt: new Date().toISOString()
+                 };
+            });
+
+                         // 儲存到 D1 資料庫
+            saveSchedulesToDB(selectedDates, staffValue, status).then(({ success, errors }) => {
+                console.log('行程已儲存到資料庫');
+                
+                // 更新所有新增日期的顯示
+                selectedDates.forEach(date => {
+                    displaySchedule(date);
+                });
+                
+                // 如果當前檢視的日期不在新增列表中，也要更新當前檢視
+                const currentViewDate = getSelectedDateValue('view');
+                if (currentViewDate && !selectedDates.includes(currentViewDate)) {
+                    displaySchedule(currentViewDate);
+                }
+                
+                // 重置表單
+                document.getElementById('staffSelect').value = '';
+                
+                // 重置狀態選擇
+                if (isCustomInput) {
+                    // 如果之前是自行輸入模式，清空輸入框但保持自定義模式
+                    statusInput.value = '';
+                    // 保持自定義模式標記，讓用戶可以繼續輸入
+                    // 確保輸入框仍然顯示
+                    statusInput.style.display = 'block';
+                    document.getElementById('backToSelectBtn').style.display = 'block';
+                } else {
+                    // 如果之前是選單模式，重置為空值
+                    statusSelect.value = '';
+                }
+                
+                // 清空選中的日期
+                selectedDates.length = 0;
+                updateMainDateDisplay();
+                renderCalendar();
+                
+                // 根據結果顯示相應訊息
+                if (errors.length === 0) {
+                    alert(`已成功新增 ${success.length} 個日期的行程`);
+                } else {
+                    const successCount = success.length;
+                    const errorCount = errors.length;
+                    alert(`部分成功：${successCount} 個日期成功，${errorCount} 個日期失敗\n\n請檢查網路連線後重試失敗的日期`);
+                }
+            }).catch(error => {
+                console.error('儲存失敗:', error);
+                alert('儲存失敗，請稍後再試');
+            });
+        }
+
+        function displaySchedule(dateStr = null) {
+            const date = dateStr || getSelectedDateValue('view');
+            const output = document.getElementById('scheduleOutput');
+
+            if (!date || !schedules[date]) {
+                output.innerHTML = '<div class="no-data">此日期沒有行程資料</div>';
+                return;
+            }
+
+            let html = `<div class="date-header">${formatDate(date)}</div>`;
+
+            // 按部門順序顯示
+            const departmentOrder = ['後管科', '留守科'];
+            
+            departmentOrder.forEach(dept => {
+                if (schedules[date][dept] && Object.keys(schedules[date][dept]).length > 0) {
+                    html += `<div class="department">`;
+                    html += `<div class="department-name">［${dept}］</div>`;
+                    html += `<div class="staff-list">`;
+                    
+                                         Object.entries(schedules[date][dept]).forEach(([name, data]) => {
+                         // 支援舊格式和新格式
+                         const status = typeof data === 'string' ? data : data.status;
+                         const addedBy = typeof data === 'string' ? '未知' : (data.addedBy || '未知');
+                         
+                         html += `<div class="staff-item">`;
+                         html += `<div class="staff-info">`;
+                         html += `<span class="staff-name">${name}：</span>`;
+                         html += `<span class="staff-status">${status}</span>`;
+                         html += `<span style="font-size: 11px; color: #666; margin-left: 8px;">(由 ${addedBy} 新增)</span>`;
+                         html += `</div>`;
+                         html += `<button class="btn-delete" onclick="deleteStaffSchedule('${date}', '${dept}', '${name}')" title="刪除此行程"></button>`;
+                         html += `</div>`;
+                     });
+                    
+                    html += `</div></div>`;
+                }
+            });
+
+            output.innerHTML = html;
+        }
+
+        function clearSelectedDates() {
+            selectedDates.length = 0;
+            updateMainDateDisplay();
+            renderCalendar();
+        }
+
+        function clearAll() {
+            if (confirm('確定要清除所有資料嗎？')) {
+                schedules = {};
+                // 注意：這裡需要實作清除所有資料的 API
+                alert('清除功能需要實作 D1 資料庫的清除 API');
+                displaySchedule();
+            }
+        }
+         
+                   function copyScheduleText() {
+              const output = document.getElementById('scheduleOutput');
+              
+                             // 檢查是否有行程資料
+               if (!output.querySelector('.date-header')) {
+                   alert('請先選擇日期檢視行程，才能複製資料');
+                   return;
+               }
+              
+              // 直接從DOM結構生成文字，避免innerText的問題
+              let formattedText = '';
+              
+              // 獲取日期標題
+              const dateHeader = output.querySelector('.date-header');
+              if (dateHeader) {
+                  formattedText += dateHeader.textContent + '\n\n';
+              }
+              
+              // 獲取部門資訊
+              const departments = output.querySelectorAll('.department');
+              departments.forEach(dept => {
+                  const deptName = dept.querySelector('.department-name');
+                  if (deptName) {
+                      formattedText += deptName.textContent + '\n';
+                  }
+                  
+                  const staffItems = dept.querySelectorAll('.staff-item');
+                                     staffItems.forEach(staff => {
+                       const staffName = staff.querySelector('.staff-name');
+                       const staffStatus = staff.querySelector('.staff-status');
+                       if (staffName && staffStatus) {
+                           const nameText = staffName.textContent;
+                           const statusText = staffStatus.textContent;
+                           formattedText += '  ' + nameText + statusText + '\n';
+                       }
+                   });
+                  
+                  formattedText += '\n';
+              });
+              
+              // 清理多餘的空行
+              formattedText = formattedText.replace(/\n\s*\n\s*\n/g, '\n\n').trim();
+              
+              // 使用現代瀏覽器的 Clipboard API
+              if (navigator.clipboard && window.isSecureContext) {
+                  navigator.clipboard.writeText(formattedText).then(() => {
+                      alert('行程文字已複製到剪貼簿！');
+                  }).catch(() => {
+                      // 如果 Clipboard API 失敗，使用傳統方法
+                      fallbackCopyTextToClipboard(formattedText);
+                  });
+              } else {
+                  // 傳統方法
+                  fallbackCopyTextToClipboard(formattedText);
+              }
+          }
+         
+         function fallbackCopyTextToClipboard(text) {
+             const textArea = document.createElement('textarea');
+             textArea.value = text;
+             textArea.style.position = 'fixed';
+             textArea.style.left = '-999999px';
+             textArea.style.top = '-999999px';
+             document.body.appendChild(textArea);
+             textArea.focus();
+             textArea.select();
+             
+             try {
+                 document.execCommand('copy');
+                 alert('行程文字已複製到剪貼簿！');
+             } catch (err) {
+                 alert('複製失敗，請手動選擇文字複製');
+             }
+             
+             document.body.removeChild(textArea);
+         }
+        
+
+
+        // 添加滑鼠和觸控事件處理
+        document.addEventListener('mouseup', handleDragEnd);
+        document.addEventListener('touchend', handleDragEnd);
+        
+        function handleDragEnd() {
+            if (isDragging && dragStartDate && dragEndDate) {
+                // 只有在真正拖拽時才處理範圍選擇
+                const start = new Date(dragStartDate);
+                const end = new Date(dragEndDate);
+                
+                if (start > end) {
+                    [start, end] = [end, start];
+                }
+                
+                const rangeDates = [];
+                for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+                    const dateStr = d.getFullYear() + '-' + 
+                        String(d.getMonth() + 1).padStart(2, '0') + '-' + 
+                        String(d.getDate()).padStart(2, '0');
+                    rangeDates.push(dateStr);
+                }
+                
+                // 檢查是否為有效的日期範圍（避免選擇過多日期）
+                if (rangeDates.length > 31) {
+                    alert('拖拽範圍過大，最多只能選擇31天');
+                    // 重置拖拽狀態
+                    isDragging = false;
+                    dragStartDate = null;
+                    dragEndDate = null;
+                    return;
+                }
+                
+                // 將拖拽範圍的日期添加到選中列表（去重）
+                rangeDates.forEach(dateStr => {
+                    if (!selectedDates.includes(dateStr)) {
+                        selectedDates.push(dateStr);
+                    }
+                });
+                
+                updateMainDateDisplay();
+                renderCalendar();
+            }
+            
+            // 重置拖拽狀態
+            isDragging = false;
+            dragStartDate = null;
+            dragEndDate = null;
+        }
+
+                 // 點擊外部關閉日曆
+         document.addEventListener('click', function(event) {
+             const popup = document.getElementById('calendarPopup');
+             const isClickInside = popup.contains(event.target);
+             const isClickOnPicker = event.target.closest('.date-picker');
+             const isClickOnButton = event.target.closest('button');
+             
+             // 只有在點擊外部且不是按鈕時才關閉日曆
+             if (!isClickInside && !isClickOnPicker && !isClickOnButton && popup.style.display === 'block') {
+                 closeCalendar();
+             }
+         });
+
+                                                                       
+            
+                         
+            
+        // D1 資料庫相關函數
+        async function saveSchedulesToDB(selectedDates, staffValue, status) {
+            try {
+                console.log('開始儲存到 D1 資料庫...');
+                
+                const results = [];
+                const errors = [];
+                
+                // 為每個選中的日期添加行程
+                for (const date of selectedDates) {
+                    try {
+                        const [department, staffName] = staffValue.split(',');
+                        
+                        const response = await fetch(SCHEDULES_API, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                date,
+                                department,
+                                staff_name: staffName,
+                                status,
+                                added_by: currentUser
+                            })
+                        });
+                        
+                        if (!response.ok) {
+                            throw new Error(`儲存失敗: ${response.status}`);
+                        }
+                        
+                        results.push(date);
+                        console.log(`日期 ${date} 儲存成功`);
+                    } catch (error) {
+                        console.error(`日期 ${date} 儲存失敗:`, error);
+                        errors.push({ date, error: error.message });
+                    }
+                }
+                
+                // 如果有錯誤，顯示部分成功的訊息
+                if (errors.length > 0) {
+                    const successCount = results.length;
+                    const errorCount = errors.length;
+                    console.warn(`${successCount} 個日期成功，${errorCount} 個日期失敗`);
+                    
+                    if (successCount > 0) {
+                        console.log('成功儲存的日期:', results);
+                    }
+                    if (errorCount > 0) {
+                        console.error('失敗的日期:', errors);
+                    }
+                } else {
+                    console.log('所有日期都已成功儲存到 D1 資料庫');
+                }
+                
+                return { success: results, errors };
+            } catch (error) {
+                console.error('D1 資料庫儲存錯誤:', error);
+                throw error;
+            }
+        }
+        
+        async function loadSchedulesFromDB() {
+            try {
+                console.log('嘗試載入 D1 資料庫...');
+                const response = await fetch(SCHEDULES_API);
+                console.log('API 回應狀態:', response.status);
+                console.log('API 回應標頭:', response.headers);
+                
+                if (response.ok) {
+                    const contentType = response.headers.get('content-type');
+                    console.log('回應內容類型:', contentType);
+                    
+                    if (contentType && contentType.includes('application/json')) {
+                        const data = await response.json();
+                        schedules = data;
+                        console.log('從 D1 資料庫載入資料成功');
+                        return true;
+                    } else {
+                        const text = await response.text();
+                        console.error('API 返回非 JSON 資料:', text.substring(0, 200));
+                        throw new Error('API 返回非 JSON 資料');
+                    }
+                } else {
+                    console.log('D1 資料庫連線失敗，狀態碼:', response.status);
+                    const errorText = await response.text();
+                    console.error('錯誤詳情:', errorText.substring(0, 200));
+                    schedules = {};
+                    return false;
+                }
+            } catch (error) {
+                console.error('從 D1 資料庫載入資料失敗:', error);
+                console.log('使用本地儲存作為備用方案');
+                loadSchedulesFromStorage();
+                return false;
+            }
+        }
+        
+        async function deleteScheduleFromDB(date, department, staff_name) {
+            try {
+                const response = await fetch(SCHEDULES_API, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        date,
+                        department,
+                        staff_name,
+                        added_by: currentUser
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`刪除失敗: ${response.status}`);
+                }
+                
+                console.log('行程已從 D1 資料庫刪除');
+                return true;
+            } catch (error) {
+                console.error('D1 資料庫刪除錯誤:', error);
+                throw error;
+            }
+        }
+        
+
+            
+            
+            
+                         // 輔助函數：將顯示格式的日期轉換為標準格式
+             function parseDateFromDisplay(dateStr) {
+                 // 處理 "月/日（星期）" 格式
+                 const match = dateStr.match(/(\d+)\/(\d+)/);
+                 if (match) {
+                     const month = parseInt(match[1]);
+                     const day = parseInt(match[2]);
+                     const year = new Date().getFullYear();
+                     return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                 }
+                 return null;
+             }
+             
+             
+          
+          // 本地儲存相關函數（備用）
+          function saveSchedulesToStorage() {
+              try {
+                  localStorage.setItem('personnelSchedules', JSON.stringify(schedules));
+              } catch (error) {
+                  console.error('儲存資料失敗:', error);
+              }
+          }
+          
+          function loadSchedulesFromStorage() {
+              try {
+                  const savedData = localStorage.getItem('personnelSchedules');
+                  if (savedData) {
+                      schedules = JSON.parse(savedData);
+                  }
+              } catch (error) {
+                  console.error('載入資料失敗:', error);
+                  schedules = {};
+              }
+          }
+        
+        // 行程狀態選單處理
+        document.getElementById('statusSelect').addEventListener('change', function() {
+            const statusSelect = document.getElementById('statusSelect');
+            const statusInput = document.getElementById('statusInput');
+            const backToSelectBtn = document.getElementById('backToSelectBtn');
+            
+            if (statusSelect.value === 'custom') {
+                // 顯示自行輸入框和回到選單按鈕
+                statusSelect.style.display = 'none';
+                statusInput.style.display = 'block';
+                backToSelectBtn.style.display = 'block';
+                statusInput.focus();
+                statusInput.value = '';
+                
+                // 標記為正在輸入模式
+                statusInput.dataset.isCustomMode = 'true';
+                
+                // 在手機上，延遲聚焦以避免觸控事件衝突
+                setTimeout(() => {
+                    statusInput.focus();
+                }, 1000);
+            }
+        });
+        
+        // 自行輸入框失去焦點時的處理 - 考慮觸控狀態
+        document.getElementById('statusInput').addEventListener('blur', function(event) {
+            // 如果正在觸控，不處理blur事件
+            if (isTouching) {
+                return;
+            }
+            
+            // 在手機上，blur事件可能會因為觸控操作而觸發
+            // 我們需要延遲檢查，避免與觸控事件衝突
+            setTimeout(() => {
+                const statusInput = document.getElementById('statusInput');
+                const statusSelect = document.getElementById('statusSelect');
+                const backToSelectBtn = document.getElementById('backToSelectBtn');
+                
+                // 如果正在觸控，不處理
+                if (isTouching) {
+                    return;
+                }
+                
+                // 只有在輸入框為空且確實處於自定義模式時才跳回選單
+                if (statusInput.value.trim() === '' && statusInput.dataset.isCustomMode === 'true') {
+                    // 檢查是否真的失去了焦點（不是因為點擊其他元素）
+                    if (document.activeElement !== statusInput) {
+                        statusSelect.style.display = 'block';
+                        statusInput.style.display = 'none';
+                        backToSelectBtn.style.display = 'none';
+                        statusSelect.value = '';
+                        delete statusInput.dataset.isCustomMode;
+                    }
+                }
+            }, 2000); // 延遲200ms，避免與觸控事件衝突
+        });
+        
+        // 自行輸入框按下Enter鍵時的處理
+        document.getElementById('statusInput').addEventListener('keydown', function(event) {
+            if (event.key === 'Enter') {
+                const statusInput = document.getElementById('statusInput');
+                
+                // 如果有輸入內容，保持自定義模式
+                if (statusInput.value.trim() !== '') {
+                    return;
+                }
+                
+                // 如果沒有輸入內容，回到選單
+                backToStatusSelect();
+            }
+        });
+        
+        // 添加觸控事件處理，防止手機上的意外跳回
+        let isTouching = false;
+        
+        document.getElementById('statusInput').addEventListener('touchstart', function() {
+            isTouching = true;
+        });
+        
+        document.getElementById('statusInput').addEventListener('touchend', function() {
+            setTimeout(() => {
+                isTouching = false;
+            }, 100);
+        });
+        
+        // 回到狀態選單的函數
+        function backToStatusSelect() {
+            const statusSelect = document.getElementById('statusSelect');
+            const statusInput = document.getElementById('statusInput');
+            const backToSelectBtn = document.getElementById('backToSelectBtn');
+            
+            statusSelect.style.display = 'block';
+            statusInput.style.display = 'none';
+            backToSelectBtn.style.display = 'none';
+            statusSelect.value = ''; // 重置為空值
+            delete statusInput.dataset.isCustomMode;
+        }
+        
+        // 檢查當前狀態選擇模式的函數
+        function getCurrentStatusMode() {
+            const statusSelect = document.getElementById('statusSelect');
+            const statusInput = document.getElementById('statusInput');
+            
+            if (statusSelect.style.display === 'none' || statusInput.style.display === 'block') {
+                return 'custom';
+            } else {
+                return 'select';
+            }
+        }
+        
+                 // 刪除特定人員的行程
+         function deleteStaffSchedule(date, department, staffName) {
+             // 檢查權限：只有新增者或管理員可以刪除
+             const scheduleData = schedules[date]?.[department]?.[staffName];
+             if (scheduleData) {
+                 const addedBy = typeof scheduleData === 'string' ? '未知' : (scheduleData.addedBy || '未知');
+                 if (addedBy !== '未知' && addedBy !== currentUser) {
+                     alert(`只有行程新增者 (${addedBy}) 才能刪除此行程`);
+                     return;
+                 }
+             }
+             
+             if (confirm(`確定要刪除 ${staffName} 在 ${formatDate(date)} 的行程嗎？`)) {
+                 // 刪除該人員的行程
+                 if (schedules[date] && schedules[date][department]) {
+                     delete schedules[date][department][staffName];
+                     
+                     // 如果該部門沒有人員了，刪除整個部門
+                     if (Object.keys(schedules[date][department]).length === 0) {
+                         delete schedules[date][department];
+                     }
+                     
+                     // 如果該日期沒有部門了，刪除整個日期
+                     if (Object.keys(schedules[date]).length === 0) {
+                         delete schedules[date];
+                     }
+                     
+                     // 儲存到 D1 資料庫
+                     deleteScheduleFromDB(date, department, staffName).then(() => {
+                         console.log('行程已從資料庫刪除');
+                         // 即時更新檢視
+                         displaySchedule(date);
+                     }).catch(error => {
+                         console.error('刪除失敗:', error);
+                         alert('刪除失敗，請稍後再試');
+                     });
+                     
+                     alert(`已刪除 ${staffName} 的行程`);
+                 }
+             }
+         }
+
+                            // 登入功能
+         function login() {
+             const nickname = document.getElementById('userNickname').value;
+             if (!nickname) {
+                 alert('請選擇暱稱');
+                 return;
+             }
+             
+             currentUser = nickname;
+             localStorage.setItem('userNickname', nickname);
+             
+             // 隱藏登入區域，顯示主要功能
+             document.getElementById('loginSection').style.display = 'none';
+             document.getElementById('mainSection').style.display = 'block';
+             
+             // 顯示使用者資訊
+             document.getElementById('currentUser').textContent = nickname;
+             document.getElementById('userInfo').style.display = 'flex';
+             
+             // 重置選單
+             document.getElementById('userNickname').value = '';
+         }
+         
+         // 登出功能
+         function logout() {
+             currentUser = '';
+             localStorage.removeItem('userNickname');
+             
+             // 隱藏主要功能，顯示登入區域
+             document.getElementById('mainSection').style.display = 'none';
+             document.getElementById('loginSection').style.display = 'block';
+             document.getElementById('userInfo').style.display = 'none';
+         }
+         
+         // 檢查登入狀態
+         function checkLoginStatus() {
+             const savedNickname = localStorage.getItem('userNickname');
+             if (savedNickname) {
+                 currentUser = savedNickname;
+                 
+                 // 隱藏登入區域，顯示主要功能
+                 document.getElementById('loginSection').style.display = 'none';
+                 document.getElementById('mainSection').style.display = 'block';
+                 
+                 // 顯示使用者資訊
+                 document.getElementById('currentUser').textContent = savedNickname;
+                 document.getElementById('userInfo').style.display = 'flex';
+             } else {
+                 // 顯示登入區域
+                 document.getElementById('loginSection').style.display = 'block';
+                 document.getElementById('mainSection').style.display = 'none';
+                 document.getElementById('userInfo').style.display = 'none';
+             }
+         }
+         
+        // 更新 D1 資料庫同步狀態顯示
+        function updateAutoSyncStatus() {
+            const statusDiv = document.getElementById('githubSyncStatus');
+            const statusText = document.getElementById('syncStatusText');
+            
+            // 顯示 D1 資料庫同步狀態
+            statusDiv.style.background = 'rgba(40, 167, 69, 0.1)';
+            statusDiv.style.border = '1px solid #28a745';
+            statusText.style.color = '#28a745';
+            statusText.textContent = '🗄️ D1 資料庫已啟用 - 所有裝置資料即時同步';
+        }
+         
+         // 初始化
+         updateMainDateDisplay();
+         
+         // 添加自動同步
+         window.addEventListener('load', async function() {
+             console.log('頁面載入完成，開始自動同步...');
+             await loadSchedulesFromDB();
+             displaySchedule();
+         });
+         
+         // 每30秒自動檢查更新
+         setInterval(async function() {
+             console.log('檢查 D1 資料庫更新...');
+             try {
+                 const response = await fetch(SCHEDULES_API);
+                 if (response.ok) {
+                     const dbData = await response.json();
+                     if (JSON.stringify(dbData) !== JSON.stringify(schedules)) {
+                         console.log('發現資料庫有新資料，開始同步...');
+                         schedules = dbData;
+                         displaySchedule();
+                     }
+                 }
+             } catch (error) {
+                 console.log('檢查更新時發生錯誤:', error);
+             }
+         }, 30 * 1000);
+          
+          
+    </script>
+</body>
+</html>
